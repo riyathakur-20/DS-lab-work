@@ -1,0 +1,171 @@
+
+#include <stdio.h>
+
+#define SIZE 10
+#define EMPTY -1
+#define DELETED -2
+
+int hashTable[SIZE];
+
+// Initialize all slots as empty
+void initialize() {
+    int i;
+
+    for (i = 0; i < SIZE; i++)
+        hashTable[i] = EMPTY;
+}
+
+// Insert a key using linear probing
+void insert(int key) {
+    int index = key % SIZE;
+    int i, pos, firstDeleted = -1;
+
+    for (i = 0; i < SIZE; i++) {
+        pos = (index + i) % SIZE;
+
+        if (hashTable[pos] == key) {
+            printf("Key already exists!\n");
+            return;
+        }
+
+        if (hashTable[pos] == DELETED && firstDeleted == -1)
+            firstDeleted = pos;
+
+        if (hashTable[pos] == EMPTY) {
+            if (firstDeleted != -1)
+                pos = firstDeleted;
+
+            hashTable[pos] = key;
+            printf("Key inserted at index %d\n", pos);
+            return;
+        }
+    }
+
+    // Use a deleted slot if the table has no empty slots
+    if (firstDeleted != -1) {
+        hashTable[firstDeleted] = key;
+        printf("Key inserted at index %d\n", firstDeleted);
+    } else {
+        printf("Hash table is full!\n");
+    }
+}
+
+// Search for a key
+void search(int key) {
+    int index = key % SIZE;
+    int i, pos;
+
+    for (i = 0; i < SIZE; i++) {
+        pos = (index + i) % SIZE;
+
+        if (hashTable[pos] == EMPTY)
+            break;
+
+        if (hashTable[pos] == key) {
+            printf("Key found at index %d\n", pos);
+            return;
+        }
+    }
+
+    printf("Key not found!\n");
+}
+
+// Delete a key without breaking the probe sequence
+void deleteKey(int key) {
+    int index = key % SIZE;
+    int i, pos;
+
+    for (i = 0; i < SIZE; i++) {
+        pos = (index + i) % SIZE;
+
+        if (hashTable[pos] == EMPTY)
+            break;
+
+        if (hashTable[pos] == key) {
+            hashTable[pos] = DELETED;
+            printf("Key deleted successfully.\n");
+            return;
+        }
+    }
+
+    printf("Key not found!\n");
+}
+
+// Display the hash table
+void display() {
+    int i;
+
+    printf("\nIndex\tValue\n");
+
+    for (i = 0; i < SIZE; i++) {
+        printf("%d\t", i);
+
+        if (hashTable[i] == EMPTY)
+            printf("EMPTY\n");
+        else if (hashTable[i] == DELETED)
+            printf("DELETED\n");
+        else
+            printf("%d\n", hashTable[i]);
+    }
+}
+
+int main() {
+    int choice, key;
+
+    initialize();
+
+    do {
+        printf("\n--- LINEAR PROBING ---\n");
+        printf("1. Insert\n");
+        printf("2. Search\n");
+        printf("3. Delete\n");
+        printf("4. Display\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter non-negative key: ");
+                scanf("%d", &key);
+
+                if (key < 0)
+                    printf("Invalid key!\n");
+                else
+                    insert(key);
+                break;
+
+            case 2:
+                printf("Enter key to search: ");
+                scanf("%d", &key);
+
+                if (key < 0)
+                    printf("Invalid key!\n");
+                else
+                    search(key);
+                break;
+
+            case 3:
+                printf("Enter key to delete: ");
+                scanf("%d", &key);
+
+                if (key < 0)
+                    printf("Invalid key!\n");
+                else
+                    deleteKey(key);
+                break;
+
+            case 4:
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
