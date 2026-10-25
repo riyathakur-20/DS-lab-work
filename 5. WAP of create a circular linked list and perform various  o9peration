@@ -1,0 +1,189 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure of a circular linked list node
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+// Pointer to the last node
+struct Node *last = NULL;
+
+// Insert a node at a specified position
+void insert(int value, int pos) {
+    struct Node *newNode, *temp;
+    int i;
+
+    if (pos < 1) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    newNode->data = value;
+
+    // Create the first node
+    if (last == NULL) {
+        if (pos != 1) {
+            printf("Invalid position!\n");
+            free(newNode);
+            return;
+        }
+
+        newNode->next = newNode;
+        last = newNode;
+        printf("Node inserted successfully.\n");
+        return;
+    }
+
+    // Insert at beginning
+    if (pos == 1) {
+        newNode->next = last->next;
+        last->next = newNode;
+        printf("Node inserted successfully.\n");
+        return;
+    }
+
+    // Find the node before the insertion position
+    temp = last->next;
+
+    for (i = 1; i < pos - 1 && temp != last; i++)
+        temp = temp->next;
+
+    if (i != pos - 1) {
+        printf("Invalid position!\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+
+    // Update last if inserted at the end
+    if (temp == last)
+        last = newNode;
+
+    printf("Node inserted successfully.\n");
+}
+
+// Delete a node from a specified position
+void deleteNode(int pos) {
+    struct Node *temp, *del;
+    int i;
+
+    if (last == NULL || pos < 1) {
+        printf("List is empty or position is invalid!\n");
+        return;
+    }
+
+    // Delete the first node
+    if (pos == 1) {
+        del = last->next;
+
+        // Only one node exists
+        if (del == last) {
+            free(del);
+            last = NULL;
+        } else {
+            last->next = del->next;
+            free(del);
+        }
+
+        printf("Node deleted successfully.\n");
+        return;
+    }
+
+    temp = last->next;
+
+    // Find the node before the one to delete
+    for (i = 1; i < pos - 1 && temp != last; i++)
+        temp = temp->next;
+
+    if (i != pos - 1 || temp->next == last->next) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    del = temp->next;
+    temp->next = del->next;
+
+    // Update last if the last node is deleted
+    if (del == last)
+        last = temp;
+
+    free(del);
+    printf("Node deleted successfully.\n");
+}
+
+// Display the circular linked list
+void display() {
+    struct Node *temp;
+
+    if (last == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    temp = last->next;
+
+    printf("Circular Linked List: ");
+
+    do {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    } while (temp != last->next);
+
+    printf("(back to beginning)\n");
+}
+
+int main() {
+    int choice, value, pos;
+
+    do {
+        printf("\n--- CIRCULAR LINKED LIST ---\n");
+        printf("1. Insert\n");
+        printf("2. Delete\n");
+        printf("3. Display\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value and position: ");
+                scanf("%d%d", &value, &pos);
+                insert(value, pos);
+                break;
+
+            case 2:
+                printf("Enter position to delete: ");
+                scanf("%d", &pos);
+                deleteNode(pos);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    // Free all nodes
+    while (last != NULL)
+        deleteNode(1);
+
+    return 0;
+}
