@@ -1,0 +1,177 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure of a singly linked list node
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+// Insert a node at a given position
+void insert(int value, int pos) {
+    struct Node *newNode, *temp;
+    int i;
+
+    newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+
+    // Insertion at beginning
+    if (pos == 1) {
+        newNode->next = head;
+        head = newNode;
+        printf("Node inserted successfully.\n");
+        return;
+    }
+
+    temp = head;
+
+    // Move to the node before the required position
+    for (i = 1; temp != NULL && i < pos - 1; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Invalid position!\n");
+        free(newNode);
+        return;
+    }
+
+    newNode->next = temp->next;
+    temp->next = newNode;
+
+    printf("Node inserted successfully.\n");
+}
+
+// Delete a node from a given position
+void deleteNode(int pos) {
+    struct Node *temp, *del;
+    int i;
+
+    if (head == NULL || pos < 1) {
+        printf("List is empty or position is invalid!\n");
+        return;
+    }
+
+    // Deletion from beginning
+    if (pos == 1) {
+        temp = head;
+        head = head->next;
+        free(temp);
+        printf("Node deleted successfully.\n");
+        return;
+    }
+
+    temp = head;
+
+    for (i = 1; temp != NULL && i < pos - 1; i++)
+        temp = temp->next;
+
+    if (temp == NULL || temp->next == NULL) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    del = temp->next;
+    temp->next = del->next;
+    free(del);
+
+    printf("Node deleted successfully.\n");
+}
+
+// Reverse the linked list
+void reverse() {
+    struct Node *prev = NULL;
+    struct Node *current = head;
+    struct Node *nextNode;
+
+    while (current != NULL) {
+        nextNode = current->next;
+        current->next = prev;
+        prev = current;
+        current = nextNode;
+    }
+
+    head = prev;
+    printf("List reversed successfully.\n");
+}
+
+// Display all nodes
+void display() {
+    struct Node *temp = head;
+
+    if (temp == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    printf("Linked List: ");
+
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+
+    printf("NULL\n");
+}
+
+int main() {
+    int choice, value, pos;
+
+    do {
+        printf("\n--- SINGLY LINKED LIST ---\n");
+        printf("1. Insert at beginning/end/position\n");
+        printf("2. Delete from beginning/end/position\n");
+        printf("3. Display\n");
+        printf("4. Reverse list\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value and position: ");
+                scanf("%d%d", &value, &pos);
+                insert(value, pos);
+                break;
+
+            case 2:
+                printf("Enter position to delete: ");
+                scanf("%d", &pos);
+                deleteNode(pos);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 4:
+                reverse();
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    // Free remaining nodes
+    while (head != NULL) {
+        struct Node *temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    return 0;
+}
