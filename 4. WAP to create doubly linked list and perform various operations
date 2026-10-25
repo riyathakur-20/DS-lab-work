@@ -1,0 +1,168 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Node of a doubly linked list
+struct Node {
+    int data;
+    struct Node *prev;
+    struct Node *next;
+};
+
+struct Node *head = NULL;
+
+// Insert a node at a specified position
+void insert(int value, int pos) {
+    struct Node *newNode, *temp;
+    int i;
+
+    if (pos < 1) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    newNode->data = value;
+    newNode->prev = NULL;
+    newNode->next = NULL;
+
+    // Insert at beginning
+    if (pos == 1) {
+        newNode->next = head;
+
+        if (head != NULL)
+            head->prev = newNode;
+
+        head = newNode;
+        printf("Node inserted successfully.\n");
+        return;
+    }
+
+    temp = head;
+
+    for (i = 1; temp != NULL && i < pos - 1; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Invalid position!\n");
+        free(newNode);
+        return;
+    }
+
+    // Connect new node with its previous and next nodes
+    newNode->next = temp->next;
+    newNode->prev = temp;
+
+    if (temp->next != NULL)
+        temp->next->prev = newNode;
+
+    temp->next = newNode;
+
+    printf("Node inserted successfully.\n");
+}
+
+// Delete a node from a specified position
+void deleteNode(int pos) {
+    struct Node *temp;
+    int i;
+
+    if (head == NULL || pos < 1) {
+        printf("List is empty or position is invalid!\n");
+        return;
+    }
+
+    temp = head;
+
+    for (i = 1; temp != NULL && i < pos; i++)
+        temp = temp->next;
+
+    if (temp == NULL) {
+        printf("Invalid position!\n");
+        return;
+    }
+
+    // Update previous node or head
+    if (temp->prev != NULL)
+        temp->prev->next = temp->next;
+    else
+        head = temp->next;
+
+    // Update next node's previous pointer
+    if (temp->next != NULL)
+        temp->next->prev = temp->prev;
+
+    free(temp);
+    printf("Node deleted successfully.\n");
+}
+
+// Display list in forward direction
+void display() {
+    struct Node *temp = head;
+
+    if (temp == NULL) {
+        printf("List is empty.\n");
+        return;
+    }
+
+    printf("Doubly Linked List: ");
+
+    while (temp != NULL) {
+        printf("%d <-> ", temp->data);
+        temp = temp->next;
+    }
+
+    printf("NULL\n");
+}
+
+int main() {
+    int choice, value, pos;
+
+    do {
+        printf("\n--- DOUBLY LINKED LIST ---\n");
+        printf("1. Insert\n");
+        printf("2. Delete\n");
+        printf("3. Display\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value and position: ");
+                scanf("%d%d", &value, &pos);
+                insert(value, pos);
+                break;
+
+            case 2:
+                printf("Enter position to delete: ");
+                scanf("%d", &pos);
+                deleteNode(pos);
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    // Free allocated memory
+    while (head != NULL) {
+        struct Node *temp = head;
+        head = head->next;
+        free(temp);
+    }
+
+    return 0;
+}
