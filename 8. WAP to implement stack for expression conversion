@@ -1,0 +1,60 @@
+
+#include <stdio.h>
+#include <string.h>
+
+#define MAX 1000
+
+// Array used as a character stack
+char stack[MAX];
+
+// Function to check whether brackets are balanced
+int isValid(char str[]) {
+    int top = -1;
+    int i;
+    char ch;
+
+    for (i = 0; str[i] != '\0'; i++) {
+        ch = str[i];
+
+        // Push opening brackets
+        if (ch == '(' || ch == '{' || ch == '[') {
+            if (top == MAX - 1)
+                return 0;
+
+            stack[++top] = ch;
+        }
+
+        // Check closing brackets
+        else if (ch == ')' || ch == '}' || ch == ']') {
+            if (top == -1)
+                return 0;
+
+            // Check matching bracket types
+            if ((ch == ')' && stack[top] != '(') ||
+                (ch == '}' && stack[top] != '{') ||
+                (ch == ']' && stack[top] != '[')) {
+                return 0;
+            }
+
+            // Remove the matching opening bracket
+            top--;
+        }
+    }
+
+    // Valid only if no opening bracket remains
+    return top == -1;
+}
+
+int main() {
+    char str[MAX];
+
+    printf("Enter an expression: ");
+    scanf("%999s", str);
+
+    if (isValid(str))
+        printf("Valid Parentheses\n");
+    else
+        printf("Invalid Parentheses\n");
+
+    return 0;
+}
