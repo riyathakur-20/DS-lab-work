@@ -1,0 +1,127 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+// Structure of a queue node
+struct Node {
+    int data;
+    struct Node *next;
+};
+
+// Front removes elements; rear inserts elements
+struct Node *front = NULL;
+struct Node *rear = NULL;
+
+// Insert an element at the rear
+void enqueue(int value) {
+    struct Node *newNode;
+
+    newNode = (struct Node *)malloc(sizeof(struct Node));
+
+    if (newNode == NULL) {
+        printf("Memory allocation failed!\n");
+        return;
+    }
+
+    newNode->data = value;
+    newNode->next = NULL;
+
+    // If the queue is empty, both pointers refer to new node
+    if (rear == NULL) {
+        front = rear = newNode;
+    } else {
+        // Attach new node at the end
+        rear->next = newNode;
+        rear = newNode;
+    }
+
+    printf("Element inserted successfully.\n");
+}
+
+// Remove an element from the front
+void dequeue() {
+    struct Node *temp;
+
+    if (front == NULL) {
+        printf("Queue Underflow!\n");
+        return;
+    }
+
+    temp = front;
+
+    printf("Deleted element: %d\n", temp->data);
+
+    front = front->next;
+
+    // If queue becomes empty, reset rear as well
+    if (front == NULL)
+        rear = NULL;
+
+    free(temp);
+}
+
+// Display all queue elements
+void display() {
+    struct Node *temp = front;
+
+    if (temp == NULL) {
+        printf("Queue is empty.\n");
+        return;
+    }
+
+    printf("Queue elements: ");
+
+    while (temp != NULL) {
+        printf("%d ", temp->data);
+        temp = temp->next;
+    }
+
+    printf("\n");
+}
+
+int main() {
+    int choice, value;
+
+    do {
+        printf("\n--- QUEUE USING LINKED LIST ---\n");
+        printf("1. Enqueue\n");
+        printf("2. Dequeue\n");
+        printf("3. Display\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &value);
+                enqueue(value);
+                break;
+
+            case 2:
+                dequeue();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    // Free any nodes left in the queue
+    while (front != NULL) {
+        struct Node *temp = front;
+        front = front->next;
+        free(temp);
+    }
+
+    rear = NULL;
+
+    return 0;
+}
