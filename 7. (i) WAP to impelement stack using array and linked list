@@ -1,0 +1,81 @@
+
+#include <stdio.h>
+#define MAX 100
+
+int stack[MAX];
+int top = -1;
+
+// Insert an element at the top
+void push(int value) {
+    if (top == MAX - 1) {
+        printf("Stack Overflow!\n");
+        return;
+    }
+
+    stack[++top] = value;
+    printf("Element pushed successfully.\n");
+}
+
+// Remove the top element
+void pop() {
+    if (top == -1) {
+        printf("Stack Underflow!\n");
+        return;
+    }
+
+    printf("Popped element: %d\n", stack[top]);
+    top--;
+}
+
+// Display stack from top to bottom
+void display() {
+    int i;
+
+    if (top == -1) {
+        printf("Stack is empty.\n");
+        return;
+    }
+
+    printf("Stack elements:\n");
+
+    for (i = top; i >= 0; i--)
+        printf("%d\n", stack[i]);
+}
+
+int main() {
+    int choice, value;
+
+    do {
+        printf("\n--- STACK USING ARRAY ---\n");
+        printf("1. Push\n");
+        printf("2. Pop\n");
+        printf("3. Display\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter value: ");
+                scanf("%d", &value);
+                push(value);
+                break;
+
+            case 2:
+                pop();
+                break;
+
+            case 3:
+                display();
+                break;
+
+            case 0:
+                break;
+
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 0);
+
+    return 0;
+}
