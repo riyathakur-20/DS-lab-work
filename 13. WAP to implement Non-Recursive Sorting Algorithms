@@ -1,0 +1,281 @@
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+// Swap two numbers
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// 1. Bubble Sort
+void bubbleSort(int a[], int n) {
+    int i, j;
+
+    for (i = 0; i < n - 1; i++) {
+        for (j = 0; j < n - i - 1; j++) {
+            if (a[j] > a[j + 1])
+                swap(&a[j], &a[j + 1]);
+        }
+    }
+}
+
+// 2. Selection Sort
+void selectionSort(int a[], int n) {
+    int i, j, min;
+
+    for (i = 0; i < n - 1; i++) {
+        min = i;
+
+        for (j = i + 1; j < n; j++) {
+            if (a[j] < a[min])
+                min = j;
+        }
+
+        swap(&a[i], &a[min]);
+    }
+}
+
+// 3. Insertion Sort
+void insertionSort(int a[], int n) {
+    int i, j, key;
+
+    for (i = 1; i < n; i++) {
+        key = a[i];
+        j = i - 1;
+
+        while (j >= 0 && a[j] > key) {
+            a[j + 1] = a[j];
+            j--;
+        }
+
+        a[j + 1] = key;
+    }
+}
+
+// 4. Iterative Quick Sort
+void quickSort(int a[], int n) {
+    int stack[MAX];
+    int top = -1;
+    int low, high, i, j, pivot;
+
+    if (n <= 1)
+        return;
+
+    stack[++top] = 0;
+    stack[++top] = n - 1;
+
+    while (top >= 0) {
+        high = stack[top--];
+        low = stack[top--];
+
+        pivot = a[high];
+        i = low - 1;
+
+        for (j = low; j < high; j++) {
+            if (a[j] <= pivot) {
+                i++;
+                swap(&a[i], &a[j]);
+            }
+        }
+
+        swap(&a[i + 1], &a[high]);
+        j = i + 1;
+
+        // Store right partition boundaries
+        if (j + 1 < high) {
+            stack[++top] = j + 1;
+            stack[++top] = high;
+        }
+
+        // Store left partition boundaries
+        if (low < j - 1) {
+            stack[++top] = low;
+            stack[++top] = j - 1;
+        }
+    }
+}
+
+// 5. Shell Sort
+void shellSort(int a[], int n) {
+    int gap, i, j, temp;
+
+    for (gap = n / 2; gap > 0; gap /= 2) {
+        for (i = gap; i < n; i++) {
+            temp = a[i];
+
+            for (j = i; j >= gap &&
+                 a[j - gap] > temp; j -= gap) {
+                a[j] = a[j - gap];
+            }
+
+            a[j] = temp;
+        }
+    }
+}
+
+// 6. Radix Sort (non-negative integers)
+void radixSort(int a[], int n) {
+    int output[MAX];
+    int count[10];
+    int i, exp = 1, max = a[0];
+
+    for (i = 0; i < n; i++) {
+        if (a[i] < 0) {
+            printf("Radix Sort requires non-negative numbers.\n");
+            return;
+        }
+
+        if (a[i] > max)
+            max = a[i];
+    }
+
+    while (max / exp > 0) {
+        for (i = 0; i < 10; i++)
+            count[i] = 0;
+
+        // Count occurrences of each digit
+        for (i = 0; i < n; i++)
+            count[(a[i] / exp) % 10]++;
+
+        // Calculate cumulative positions
+        for (i = 1; i < 10; i++)
+            count[i] += count[i - 1];
+
+        // Build output array from right to left
+        for (i = n - 1; i >= 0; i--) {
+            int digit = (a[i] / exp) % 10;
+            output[--count[digit]] = a[i];
+        }
+
+        for (i = 0; i < n; i++)
+            a[i] = output[i];
+
+        if (exp > max / 10)
+            break;
+
+        exp *= 10;
+    }
+}
+
+// 7. Iterative Merge Sort
+void mergeSort(int a[], int n) {
+    int temp[MAX];
+    int width, left, mid, right, i, j, k;
+
+    for (width = 1; width < n; width *= 2) {
+        for (left = 0; left < n; left += 2 * width) {
+            mid = left + width;
+            right = left + 2 * width;
+
+            if (mid > n) mid = n;
+            if (right > n) right = n;
+
+            i = left;
+            j = mid;
+            k = left;
+
+            // Merge two sorted sections
+            while (i < mid && j < right) {
+                if (a[i] <= a[j])
+                    temp[k++] = a[i++];
+                else
+                    temp[k++] = a[j++];
+            }
+
+            while (i < mid)
+                temp[k++] = a[i++];
+
+            while (j < right)
+                temp[k++] = a[j++];
+        }
+
+        for (i = 0; i < n; i++)
+            a[i] = temp[i];
+
+        // Avoid integer overflow in width *= 2
+        if (width > n / 2)
+            break;
+    }
+}
+
+// Display the array
+void display(int a[], int n) {
+    int i;
+
+    for (i = 0; i < n; i++)
+        printf("%d ", a[i]);
+
+    printf("\n");
+}
+
+int main() {
+    int a[MAX], n, choice, i;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    if (n < 1 || n > MAX) {
+        printf("Invalid array size!\n");
+        return 0;
+    }
+
+    printf("Enter array elements:\n");
+
+    for (i = 0; i < n; i++)
+        scanf("%d", &a[i]);
+
+    do {
+        printf("\n--- SORTING MENU ---\n");
+        printf("1. Bubble Sort\n");
+        printf("2. Selection Sort\n");
+        printf("3. Insertion Sort\n");
+        printf("4. Quick Sort\n");
+        printf("5. Shell Sort\n");
+        printf("6. Radix Sort\n");
+        printf("7. Merge Sort\n");
+        printf("0. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                bubbleSort(a, n);
+                break;
+            case 2:
+                selectionSort(a, n);
+                break;
+            case 3:
+                insertionSort(a, n);
+                break;
+            case 4:
+                quickSort(a, n);
+                break;
+            case 5:
+                shellSort(a, n);
+                break;
+            case 6:
+                radixSort(a, n);
+                break;
+            case 7:
+                mergeSort(a, n);
+                break;
+            case 0:
+                break;
+            default:
+                printf("Invalid choice!\n");
+                continue;
+        }
+
+        if (choice >= 1 && choice <= 7) {
+            printf("Sorted array: ");
+            display(a, n);
+        }
+
+    } while (choice != 0);
+
+    return 0;
+}
